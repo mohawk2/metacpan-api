@@ -1,0 +1,30 @@
+---
+name: Docker build
+
+on:
+    - push
+
+jobs:
+    docker:
+        runs-on: ubuntu-latest
+        name: build and test
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/checkout@v2
+              with:
+                  path: metacpan-docker
+                  repository: metacpan/metacpan-docker
+            - name: docker build
+              run: docker build . --build-arg CPM_ARGS='--with-test' -t api
+            - name: up
+              run: >
+                  pushd $GITHUB_WORKSPACE/metacpan-docker &&
+                  ./bin/metacpan-docker init &&
+                  docker-compose up -d api &&
+                  popd
+            - name: Wait for ES
+              run: ./wait-for-es.sh http://localhost:9200
+            - name: run Perl tests
+              run: >
+                  pushd $GITHUB_WORKSPACE/metacpan-docker &&
+                  docker-compose exec -T api prove -lvr t
