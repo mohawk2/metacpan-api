@@ -28,3 +28,9 @@ jobs:
               run: >
                   pushd $GITHUB_WORKSPACE/metacpan-docker &&
                   docker-compose exec -T api prove -lvr t
+            - name: tail /var/log/syslog
+              if: ${{ failure() }}
+              run: |
+                  tail -100 /var/log/syslog|sed 's/^/SYSLOG: /'
+                  journalctl -k|grep -i -e memory -e oom|tail -100|sed 's/^/MEMORY: /'
+                  journalctl -u docker.service|tail -100|sed 's/^/DOCKER: /'
