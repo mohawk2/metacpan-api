@@ -14,8 +14,8 @@ jobs:
               with:
                   path: metacpan-docker
                   repository: metacpan/metacpan-docker
-            - name: docker build
-              run: docker build . --build-arg CPM_ARGS='--with-test' -t api
+#            - name: docker build
+#              run: docker build . --build-arg CPM_ARGS='--with-test' -t api
             - name: up
               run: >
                   pushd $GITHUB_WORKSPACE/metacpan-docker &&
